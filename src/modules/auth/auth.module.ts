@@ -5,8 +5,8 @@ import {User, UsersSchema} from '../users/schemas/users.schema';
 import {AuthService} from './auth.service';
 import {JwtModule} from '@nestjs/jwt';
 import * as process from 'node:process';
-import {MailService} from "../mail/mail.service";
 import {ResetPasswordCode, ResetPasswordCodeSchema} from "./schemas/reset-password-code.schema";
+import {MailModule} from "../mail/mail.module";
 
 @Module({
     imports: [
@@ -21,9 +21,10 @@ import {ResetPasswordCode, ResetPasswordCodeSchema} from "./schemas/reset-passwo
                 signOptions: {expiresIn: '30m'},
             }),
         }),
+        MailModule,
     ],
     controllers: [AuthController],
-    providers: [AuthService, MailService],
+    providers: [AuthService],
     exports: [AuthService],
 })
 export class AuthModule {

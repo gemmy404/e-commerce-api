@@ -32,6 +32,7 @@ import {HandlebarsAdapter} from "@nestjs-modules/mailer/dist/adapters/handlebars
     ],
     controllers: [],
     providers: [MailService],
+    exports: [MailService],
 })
 export class MailModule {
 }
