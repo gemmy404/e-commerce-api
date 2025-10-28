@@ -6,10 +6,14 @@ import {AuthService} from './auth.service';
 import {JwtModule} from '@nestjs/jwt';
 import * as process from 'node:process';
 import {MailService} from "../mail/mail.service";
+import {ResetPasswordCode, ResetPasswordCodeSchema} from "./schemas/reset-password-code.schema";
 
 @Module({
     imports: [
-        MongooseModule.forFeature([{name: User.name, schema: UsersSchema}]),
+        MongooseModule.forFeature([
+            {name: User.name, schema: UsersSchema},
+            {name: ResetPasswordCode.name, schema: ResetPasswordCodeSchema},
+        ]),
         JwtModule.registerAsync({
             global: true,
             useFactory: () => ({
@@ -19,7 +23,7 @@ import {MailService} from "../mail/mail.service";
         }),
     ],
     controllers: [AuthController],
-    providers: [AuthService],
+    providers: [AuthService, MailService],
     exports: [AuthService],
 })
 export class AuthModule {
