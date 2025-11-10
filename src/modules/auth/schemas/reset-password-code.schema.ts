@@ -1,6 +1,8 @@
 import {Prop, Schema, SchemaFactory} from "@nestjs/mongoose";
-import {Types} from "mongoose";
+import {HydratedDocument, Types} from "mongoose";
 import {User} from "../../users/schemas/users.schema";
+
+export type ResetPasswordCodeDocument = HydratedDocument<ResetPasswordCode>;
 
 @Schema({timestamps: true})
 export class ResetPasswordCode {
@@ -24,8 +26,9 @@ export class ResetPasswordCode {
     isValid: boolean;
 
     @Prop({
-        type: Types.ObjectId, ref: 'User',
-        required: true
+        required: true,
+        type: Types.ObjectId,
+        ref: User.name,
     })
     user: User;
 }
