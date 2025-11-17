@@ -9,12 +9,14 @@ import {UsersMapper} from '../users/users.mapper';
 import {UserRoles} from '../../common/utils/userRoles';
 import {ConnectedUserDto} from '../../common/dto/connected-user.dto';
 import {RoleDto} from '../../common/dto/role.dto';
+import {StoreSetting} from "./schemas/store-settings.schema";
 
 @Injectable()
 export class AdminService {
 
     constructor(
         @InjectModel(User.name) private readonly userModel: Model<User>,
+        @InjectModel(StoreSetting.name) private readonly storeSettingModel: Model<StoreSetting>,
         private readonly usersMapper: UsersMapper,
     ) {
     }
@@ -29,7 +31,7 @@ export class AdminService {
         }
 
         if (size < 1 || page < 1) {
-            throw new BadRequestException('Size and page must be greater than 1');
+            throw new BadRequestException('Size and page must be greater than 0');
         }
 
         const skip = (page - 1) * size;
@@ -91,6 +93,34 @@ export class AdminService {
             data: this.usersMapper.toUserResponse(updatedUser),
         };
 
+        return apiResponse;
+    }
+
+    async getStoreSettings(): Promise<ApiResponseDto<{ globalDiscountPercentage: number }>> {
+        let setting = await this.storeSettingModel.findOne();
+        if (!setting) {
+            setting = await this.storeSettingModel.create({});
+        }
+
+        const apiResponse: ApiResponseDto<{ globalDiscountPercentage: number }> = {
+            status: HttpStatusText.SUCCESS,
+            data: {
+                globalDiscountPercentage: setting.globalDiscountPercentage,
+            },
+        };
+        return apiResponse;
+    }
+
+    async updateGlobalDiscount(discount: number) {
+        await this.storeSettingModel
+            .updateOne({}, {globalDiscountPercentage: discount}, {upsert: true});
+
+        const apiResponse: ApiResponseDto<{ globalDiscountPercentage: number }> = {
+            status: HttpStatusText.SUCCESS,
+            data: {
+                globalDiscountPercentage: discount,
+            }
+        };
         return apiResponse;
     }
 
