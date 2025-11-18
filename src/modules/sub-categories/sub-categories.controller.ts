@@ -1,16 +1,15 @@
-import {Controller, Get, Query} from '@nestjs/common';
+import {Controller, Get, Param} from '@nestjs/common';
 import {SubCategoriesService} from './sub-categories.service';
 import {ApiResponseDto} from "../../common/dto/api-response.dto";
-import {SubCategory} from "./schemas/sub-category.schema";
 import {SubCategoryResponseDto} from "./dto/sub-category-response.dto";
 
-@Controller('api/v1/sub-categories')
+@Controller('api/v1')
 export class SubCategoriesController {
     constructor(private readonly subCategoriesService: SubCategoriesService) {
     }
 
-    @Get()
-    filterSubCategoriesByCategoryId(@Query('id') id: string): Promise<ApiResponseDto<SubCategoryResponseDto[]>> {
+    @Get('categories/:id/sub-categories')
+    getSubCategoriesByCategoryId(@Param('id') id: string): Promise<ApiResponseDto<SubCategoryResponseDto[]>> {
         return this.subCategoriesService.findAllSubCategoriesByCategoryId(id);
     }
 
