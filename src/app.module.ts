@@ -8,6 +8,7 @@ import {AdminModule} from './modules/admin/admin.module';
 import {MailModule} from './modules/mail/mail.module';
 import {CategoriesModule} from './modules/categories/categories.module';
 import {SubCategoriesModule} from "./modules/sub-categories/sub-categories.module";
+import {ProductsModule} from './modules/products/products.module';
 
 @Module({
     imports: [
@@ -21,12 +22,13 @@ import {SubCategoriesModule} from "./modules/sub-categories/sub-categories.modul
         MailModule,
         CategoriesModule,
         SubCategoriesModule,
+        ProductsModule,
     ],
     controllers: [],
     providers: [
         {
             provide: 'APP_PIPE',
-            useValue: new ValidationPipe({whitelist: true, forbidNonWhitelisted: true}),
+            useValue: new ValidationPipe({whitelist: true, forbidNonWhitelisted: true, transform: true}),
         },
     ],
 })

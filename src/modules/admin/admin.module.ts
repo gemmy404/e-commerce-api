@@ -7,6 +7,10 @@ import {UsersModule} from "../users/users.module";
 import {CategoriesModule} from "../categories/categories.module";
 import {SubCategoriesModule} from "../sub-categories/sub-categories.module";
 import {StoreSetting, StoreSettingSchema} from "./schemas/store-settings.schema";
+import {AdminCategoriesController} from "./admin-categories.controller";
+import {AdminProductsController} from "./admin-products.controller";
+import {CouponsModule} from "../coupons/coupons.module";
+import {ProductsModule} from "../products/products.module";
 
 @Module({
     imports: [
@@ -17,8 +21,10 @@ import {StoreSetting, StoreSettingSchema} from "./schemas/store-settings.schema"
         UsersModule,
         CategoriesModule,
         SubCategoriesModule,
+        CouponsModule,
+        ProductsModule,
     ],
-    controllers: [AdminController],
+    controllers: [AdminController, AdminCategoriesController, AdminProductsController],
     providers: [AdminService],
 })
 export class AdminModule {
