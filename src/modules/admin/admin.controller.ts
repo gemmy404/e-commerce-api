@@ -4,7 +4,7 @@ import {AdminService} from './admin.service';
 import {Roles} from '../auth/decorators/roles.decorator';
 import {ApiResponseDto} from '../../common/dto/api-response.dto';
 import {UserResponseDto} from '../users/dto/user-response-dto';
-import {UserRoles} from '../../common/utils/userRoles';
+import {UserRoles} from '../../common/enums/user-roles.enum';
 import {RoleDto} from '../../common/dto/role.dto';
 import {ConnectedUser} from "../auth/decorators/connected-user.decorator";
 import type {ConnectedUserDto} from "../../common/dto/connected-user.dto";

@@ -6,7 +6,7 @@ import {ApiResponseDto} from '../../common/dto/api-response.dto';
 import {HttpStatusText} from '../../common/utils/httpStatusText';
 import {UserResponseDto} from '../users/dto/user-response-dto';
 import {UsersMapper} from '../users/users.mapper';
-import {UserRoles} from '../../common/utils/userRoles';
+import {UserRoles} from '../../common/enums/user-roles.enum';
 import {ConnectedUserDto} from '../../common/dto/connected-user.dto';
 import {RoleDto} from '../../common/dto/role.dto';
 import {StoreSetting} from "./schemas/store-settings.schema";
