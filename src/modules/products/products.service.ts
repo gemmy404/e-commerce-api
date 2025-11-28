@@ -10,6 +10,7 @@ import {ProductResponseDto} from "./dto/product-response.dto";
 import {HttpStatusText} from "../../common/utils/httpStatusText";
 import {UpdateProductDto} from "./dto/update-product.dto";
 import {SubCategory} from "../sub-categories/schemas/sub-category.schema";
+import {CartItem} from "../carts/schemas/cart-items.schema";
 
 @Injectable()
 export class ProductsService {
@@ -190,6 +191,16 @@ export class ProductsService {
         const storeSetting = await this.storeSettingModel.findOne();
         return storeSetting?.globalDiscountPercentage && storeSetting.globalDiscountPercentage > 0 ?
             storeSetting.globalDiscountPercentage : 0;
+    }
+
+    async decreaseStock(items: CartItem[]) {
+        const bulkOps = items.map((item: any) => ({
+            updateOne: {
+                filter: {_id: item.productId._id},
+                update: {$inc: {quantity: -item.quantity}}
+            }
+        }));
+        return await this.productModel.bulkWrite(bulkOps);
     }
 
 }
