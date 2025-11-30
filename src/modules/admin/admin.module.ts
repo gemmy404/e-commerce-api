@@ -8,6 +8,7 @@ import {CategoriesModule} from "../categories/categories.module";
 import {SubCategoriesModule} from "../sub-categories/sub-categories.module";
 import {StoreSetting, StoreSettingSchema} from "./schemas/store-settings.schema";
 import {AdminCategoriesController} from "./admin-categories.controller";
+import {AdminCouponsController} from "./admin-coupons.controller";
 import {AdminProductsController} from "./admin-products.controller";
 import {CouponsModule} from "../coupons/coupons.module";
 import {ProductsModule} from "../products/products.module";
@@ -24,7 +25,7 @@ import {ProductsModule} from "../products/products.module";
         CouponsModule,
         ProductsModule,
     ],
-    controllers: [AdminController, AdminCategoriesController, AdminProductsController],
+    controllers: [AdminController, AdminCategoriesController, AdminCouponsController, AdminProductsController],
     providers: [AdminService],
 })
 export class AdminModule {
