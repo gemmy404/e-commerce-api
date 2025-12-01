@@ -12,7 +12,7 @@ import {
 } from '@nestjs/common';
 import {AuthGuard} from '../auth/guard/auth.guard';
 import {Roles} from '../auth/decorators/roles.decorator';
-import {UserRoles} from '../../common/utils/userRoles';
+import {UserRoles} from '../../common/enums/user-roles.enum';
 import {ProductsService} from "../products/products.service";
 import {FileInterceptor, FilesInterceptor} from "@nestjs/platform-express";
 import {createMulterStorage} from "../../common/utils/multer-storage";

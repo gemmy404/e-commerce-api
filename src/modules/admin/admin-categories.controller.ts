@@ -1,7 +1,7 @@
 import {Body, Controller, Delete, Param, Post, UseGuards} from '@nestjs/common';
 import {AuthGuard} from '../auth/guard/auth.guard';
 import {Roles} from '../auth/decorators/roles.decorator';
-import {UserRoles} from '../../common/utils/userRoles';
+import {UserRoles} from '../../common/enums/user-roles.enum';
 import {CreateCategoryDto} from "../categories/dto/create-category.dto";
 import {CategoriesService} from "../categories/categories.service";
 import {SubCategoriesService} from "../sub-categories/sub-categories.service";
