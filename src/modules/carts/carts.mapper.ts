@@ -8,7 +8,7 @@ export class CartsMapper {
             productId: item.productId._id.toString(),
             productName: item.productId.name,
             quantity: item.quantity,
-            price: item.price,
+            price: item.productId.price,
         };
     }
 }

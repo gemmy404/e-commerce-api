@@ -11,6 +11,8 @@ import {CartItemResponseDto} from "./dto/cart-item-response.dto";
 import {CartsMapper} from "./carts.mapper";
 import {CartResponseDto} from "./dto/cart-response.dto";
 import {AddToCartRequestDto} from "./dto/add-to-cart-request.dto";
+import {Coupon} from "../coupons/schemas/coupons.schema";
+import {validateCoupon} from "../../common/utils/validateCoupon";
 
 @Injectable()
 export class CartsService {
@@ -18,6 +20,7 @@ export class CartsService {
     constructor(
         @InjectModel(Cart.name) private readonly cartsModel: Model<Cart>,
         @InjectModel(Product.name) private readonly productsModel: Model<Product>,
+        @InjectModel(Coupon.name) private readonly couponsModel: Model<Coupon>,
         private readonly cartsMapper: CartsMapper
     ) {
     }
@@ -72,17 +75,27 @@ export class CartsService {
         }
 
         const items: CartItemResponseDto[] = [];
-        let total = 0;
-        savedCart.items.map(item => {
-            items.push(this.cartsMapper.toCartItemResponse(item))
-            total += item.price * item.quantity;
+        let subtotal = 0;
+        savedCart.items.map((item: any) => {
+            items.push(this.cartsMapper.toCartItemResponse(item));
+            subtotal += item.productId.price * item.quantity;
         });
+
+        let discountAmount: number = 0;
+        if (savedCart.coupon) {
+            const savedCoupon = await this.couponsModel.findOne({code: savedCart.coupon.code});
+            if (savedCoupon && validateCoupon(savedCoupon)) {
+                discountAmount = subtotal * (savedCart.coupon.value / 100);
+            }
+        }
 
         const apiResponse: ApiResponseDto<CartResponseDto> = {
             status: HttpStatusText.SUCCESS,
             data: {
                 items,
-                total
+                subtotal,
+                discountAmount,
+                total: subtotal - discountAmount,
             },
         };
         return apiResponse;
@@ -99,10 +112,17 @@ export class CartsService {
             throw new NotFoundException(`Product with id ${productId} not found`);
         }
 
-        await this.cartsModel.updateOne(
-            {userId: connectedUser.sub},
-            {$pull: {items: item}}
-        );
+        if (savedCart.items.length === 1) {
+            await this.cartsModel.updateOne(
+                {userId: connectedUser.sub},
+                {$pull: {items: item}, coupon: null},
+            );
+        } else {
+            await this.cartsModel.updateOne(
+                {userId: connectedUser.sub},
+                {$pull: {items: item}},
+            );
+        }
 
         const apiResponse: ApiResponseDto<null> = {
             status: HttpStatusText.SUCCESS,
@@ -139,6 +159,33 @@ export class CartsService {
         const apiResponse: ApiResponseDto<null> = {
             status: HttpStatusText.SUCCESS,
             data: null
+        };
+        return apiResponse;
+    }
+
+    async applyCoupon(code: string, connectedUser: ConnectedUserDto): Promise<ApiResponseDto<null>> {
+        const savedCoupon = await this.couponsModel.findOne({code});
+        if (!savedCoupon) {
+            throw new NotFoundException(`The coupon you entered is incorrect`);
+        }
+
+        const savedCart = await this.cartsModel.findOne({userId: connectedUser.sub});
+        if (!savedCart || savedCart.items.length === 0) {
+            throw new NotFoundException(`Cart is empty`);
+        }
+
+        if (!validateCoupon(savedCoupon)) {
+            savedCoupon.isValid = false;
+            await savedCoupon.save();
+            throw new BadRequestException(`The coupon is expired`)
+        }
+
+        savedCart.coupon = {code, value: savedCoupon.discount};
+        await savedCart.save();
+
+        const apiResponse: ApiResponseDto<null> = {
+            status: HttpStatusText.SUCCESS,
+            data: null,
         };
         return apiResponse;
     }

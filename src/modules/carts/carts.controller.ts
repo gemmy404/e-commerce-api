@@ -7,6 +7,7 @@ import {AddToCartRequestDto} from "./dto/add-to-cart-request.dto";
 import {UpdateQuantityRequestDto} from "./dto/update-quantity-request.dto";
 import {ApiResponseDto} from "../../common/dto/api-response.dto";
 import {CartResponseDto} from "./dto/cart-response.dto";
+import {ApplyCouponRequestDto} from "./dto/apply-coupon-request.dto";
 
 @Controller('api/v1/carts')
 @UseGuards(AuthGuard)
@@ -43,6 +44,14 @@ export class CartsController {
         @ConnectedUser() connectedUser: ConnectedUserDto
     ): Promise<ApiResponseDto<null>> {
         return this.cartsService.removeItemFromCart(productId, connectedUser);
+    }
+
+    @Post('apply-coupon')
+    applyCoupon(
+        @Body() applyCouponRequestDto: ApplyCouponRequestDto,
+        @ConnectedUser() connectedUser: ConnectedUserDto
+    ): Promise<ApiResponseDto<null>> {
+        return this.cartsService.applyCoupon(applyCouponRequestDto.code, connectedUser);
     }
 
 }

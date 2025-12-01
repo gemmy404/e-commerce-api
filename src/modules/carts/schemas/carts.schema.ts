@@ -14,6 +14,18 @@ export class Cart {
     items: CartItem[];
 
     @Prop({
+        required: false,
+        type: {
+            code: String,
+            value: Number,
+        },
+    })
+    coupon?: {
+        code: string;
+        value: number;
+    };
+
+    @Prop({
         required: true,
         type: Types.ObjectId,
         ref: User.name,
