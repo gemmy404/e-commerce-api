@@ -12,6 +12,8 @@ import {AdminCouponsController} from "./admin-coupons.controller";
 import {AdminProductsController} from "./admin-products.controller";
 import {CouponsModule} from "../coupons/coupons.module";
 import {ProductsModule} from "../products/products.module";
+import {AdminOrdersController} from "./admin-orders.controller";
+import {OrdersModule} from "../orders/orders.module";
 
 @Module({
     imports: [
@@ -24,8 +26,9 @@ import {ProductsModule} from "../products/products.module";
         SubCategoriesModule,
         CouponsModule,
         ProductsModule,
+        OrdersModule,
     ],
-    controllers: [AdminController, AdminCategoriesController, AdminCouponsController, AdminProductsController],
+    controllers: [AdminController, AdminCategoriesController, AdminCouponsController, AdminProductsController, AdminOrdersController],
     providers: [AdminService],
 })
 export class AdminModule {
