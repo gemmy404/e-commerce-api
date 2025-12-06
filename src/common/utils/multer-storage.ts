@@ -9,7 +9,7 @@ export const createMulterStorage = () => {
             if (req.url.includes('users')) {
                 uploadPath += `/profiles`;
             } else if (req.url.includes('products')) {
-                uploadPath += `/products/${req.params.id}`;
+                uploadPath += `/products`;
             }
 
             if (!fs.existsSync(uploadPath)) {

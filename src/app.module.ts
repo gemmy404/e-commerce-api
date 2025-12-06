@@ -11,6 +11,7 @@ import {SubCategoriesModule} from "./modules/sub-categories/sub-categories.modul
 import {ProductsModule} from './modules/products/products.module';
 import {CartsModule} from './modules/carts/carts.module';
 import {CouponsModule} from "./modules/coupons/coupons.module";
+import {StripeModule} from "./modules/stripe/stripe.module";
 import {OrdersModule} from "./modules/orders/orders.module";
 
 @Module({
@@ -29,6 +30,7 @@ import {OrdersModule} from "./modules/orders/orders.module";
         CartsModule,
         CouponsModule,
         OrdersModule,
+        StripeModule,
     ],
     controllers: [],
     providers: [
