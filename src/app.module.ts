@@ -13,6 +13,8 @@ import {CartsModule} from './modules/carts/carts.module';
 import {CouponsModule} from "./modules/coupons/coupons.module";
 import {StripeModule} from "./modules/stripe/stripe.module";
 import {OrdersModule} from "./modules/orders/orders.module";
+import {CloudinaryModule} from './modules/cloudinary/cloudinary.module';
+import {ScheduleModule} from "@nestjs/schedule";
 
 @Module({
     imports: [
@@ -20,6 +22,7 @@ import {OrdersModule} from "./modules/orders/orders.module";
             isGlobal: true,
         }),
         MongooseModule.forRoot(process.env.DATABASE_URL!),
+        ScheduleModule.forRoot(),
         UsersModule,
         AuthModule,
         AdminModule,
@@ -31,6 +34,7 @@ import {OrdersModule} from "./modules/orders/orders.module";
         CouponsModule,
         OrdersModule,
         StripeModule,
+        CloudinaryModule,
     ],
     controllers: [],
     providers: [
