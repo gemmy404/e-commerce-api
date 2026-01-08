@@ -5,5 +5,5 @@ export interface ApiResponseDto<T> {
   status: HttpStatusText;
   data: T,
   message?: string;
-  validationsErrors?: ValidationError[];
+  validationErrors?: ValidationError[];
 }

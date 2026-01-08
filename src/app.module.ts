@@ -15,6 +15,7 @@ import {StripeModule} from "./modules/stripe/stripe.module";
 import {OrdersModule} from "./modules/orders/orders.module";
 import {CloudinaryModule} from './modules/cloudinary/cloudinary.module';
 import {ScheduleModule} from "@nestjs/schedule";
+import {ValidationException} from "./common/exceptions/validation.exception";
 
 @Module({
     imports: [
@@ -40,7 +41,18 @@ import {ScheduleModule} from "@nestjs/schedule";
     providers: [
         {
             provide: 'APP_PIPE',
-            useValue: new ValidationPipe({whitelist: true, forbidNonWhitelisted: true, transform: true}),
+            useValue: new ValidationPipe({
+                whitelist: true,
+                forbidNonWhitelisted: true,
+                transform: true,
+                exceptionFactory: (errors) => {
+                    const messages = errors.flatMap(err =>
+                        Object.values(err.constraints ?? {})
+                    );
+
+                    return new ValidationException(messages, 400);
+                },
+            }),
         },
     ],
 })
