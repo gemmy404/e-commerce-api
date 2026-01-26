@@ -11,6 +11,8 @@ import {HttpStatusText} from "../../common/utils/httpStatusText";
 import {UpdateProductDto} from "./dto/update-product.dto";
 import {SubCategory} from "../sub-categories/schemas/sub-category.schema";
 import {CartItem} from "../carts/schemas/cart-items.schema";
+import {CloudinaryService} from "../cloudinary/cloudinary.service";
+import {buildImageUrl} from "../../common/utils/buildImageUrl";
 
 @Injectable()
 export class ProductsService {
@@ -20,6 +22,7 @@ export class ProductsService {
         @InjectModel(SubCategory.name) private readonly subCategoryModel: Model<SubCategory>,
         @InjectModel(StoreSetting.name) private readonly storeSettingModel: Model<StoreSetting>,
         private readonly productsMapper: ProductsMapper,
+        private readonly cloudinaryService: CloudinaryService,
     ) {
     }
 
@@ -32,10 +35,22 @@ export class ProductsService {
             throw new NotFoundException(`SubCategory with id: ${createProductDto.subCategoryId} not found`);
         }
 
-        const fileUrl = `${process.env.BASE_URL}/${imageCover.path.replace(/\\/g, '/')}`;
+        let uploadedDetails;
+        try {
+         uploadedDetails = await this.cloudinaryService.uploadFile(imageCover);
+        } catch (e) {
+            throw new BadRequestException(`Uploading image fail: ${e.message}`);
+        }
 
         const createdProduct = await this.productModel
-            .create({...createProductDto, subCategory: createProductDto.subCategoryId, imageCover: fileUrl});
+            .create({
+                ...createProductDto,
+                subCategory: createProductDto.subCategoryId,
+                imageCover: uploadedDetails.public_id
+            });
+
+        createdProduct.imageCover = buildImageUrl(createdProduct.imageCover) as string;
+        createdProduct.images = buildImageUrl(createdProduct.images) as string[];
 
         const apiResponse: ApiResponseDto<ProductResponseDto> = {
             status: HttpStatusText.SUCCESS,
@@ -54,16 +69,25 @@ export class ProductsService {
             throw new NotFoundException(`Product with id: ${productId} not found`);
         }
 
-        let filesUrl: string[] = [];
-        images.map(image => {
-            filesUrl.push(`${process.env.BASE_URL}/${image.path.replace(/\\/g, '/')}`)
-        })
-        savedProduct.images = filesUrl;
-
-        const updatedProduct = await savedProduct.save();
-        if (updatedProduct.images.length !== images.length) {
-            throw new BadRequestException(`Images upload incomplete`);
+        let uploadedResult;
+        try {
+            uploadedResult = await this.cloudinaryService.uploadFiles(images);
+        } catch (e) {
+            throw new BadRequestException('Images upload failed');
         }
+
+        const filesUrl: string[] = [];
+        uploadedResult.map(imgDetails => {
+            filesUrl.push(imgDetails.public_id);
+        })
+
+        savedProduct.images = filesUrl;
+        const updatedProduct = await savedProduct.save();
+
+        this.cloudinaryService.removeTags(filesUrl);
+
+        updatedProduct.imageCover = buildImageUrl(updatedProduct.imageCover) as string;
+        updatedProduct.images = buildImageUrl(updatedProduct.images) as string[];
 
         const apiResponse: ApiResponseDto<ProductResponseDto> = {
             status: HttpStatusText.SUCCESS,

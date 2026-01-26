@@ -10,13 +10,16 @@ import {UserResponseDto} from "./dto/user-response-dto";
 import {HttpStatusText} from "../../common/utils/httpStatusText";
 import {ChangePasswordDto} from "./dto/change-password-request.dto";
 import * as bcrypt from 'bcrypt';
+import {CloudinaryService} from "../cloudinary/cloudinary.service";
+import {buildImageUrl} from "../../common/utils/buildImageUrl";
 
 @Injectable()
 export class UsersService {
 
     constructor(
         @InjectModel(User.name) private userModel: Model<User>,
-        private readonly usersMapper: UsersMapper
+        private readonly usersMapper: UsersMapper,
+        private readonly cloudinaryService: CloudinaryService,
     ) {
     }
 
@@ -51,18 +54,28 @@ export class UsersService {
     }
 
     async uploadProfilePicture(file: Express.Multer.File, connectedUser: ConnectedUserDto): Promise<ApiResponseDto<UserResponseDto>> {
-        const fileUrl = `${process.env.BASE_URL}/${file.path.replace(/\\/g, '/')}`;
-
-        const updatedUser = await this.userModel
-            .findByIdAndUpdate(connectedUser.sub, {avatar: fileUrl}, {new: true})
+        const savedUser = await this.userModel
+            .findById(connectedUser.sub)
             .select('-password -__v');
-        if (!updatedUser) {
+        if (!savedUser) {
             throw new NotFoundException(`User with id ${connectedUser.sub} not found`);
         }
 
+        let uploadedDetails;
+        try {
+            uploadedDetails = await this.cloudinaryService.uploadFile(file);
+        } catch (e) {
+            throw new BadRequestException(`Uploading image fail: ${e.message}`);
+        }
+
+        savedUser.avatar = uploadedDetails.public_id;
+        await savedUser.save();
+
+        savedUser.avatar = buildImageUrl(savedUser.avatar) as string;
+
         const apiResponse: ApiResponseDto<UserResponseDto> = {
             status: HttpStatusText.SUCCESS,
-            data: this.usersMapper.toUserResponse(updatedUser),
+            data: this.usersMapper.toUserResponse(savedUser),
         }
         return apiResponse;
     }

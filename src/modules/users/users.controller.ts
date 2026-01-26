@@ -17,7 +17,6 @@ import type {ConnectedUserDto} from "../../common/dto/connected-user.dto";
 import {FileInterceptor} from "@nestjs/platform-express";
 import {ApiResponseDto} from "../../common/dto/api-response.dto";
 import {UserResponseDto} from "./dto/user-response-dto";
-import {createMulterStorage} from "../../common/utils/multer-storage";
 import {ChangePasswordDto} from "./dto/change-password-request.dto";
 
 @Controller('api/v1/users')
@@ -40,7 +39,7 @@ export class UsersController {
     }
 
     @Post('profile-picture')
-    @UseInterceptors(FileInterceptor('file', {storage: createMulterStorage()}))
+    @UseInterceptors(FileInterceptor('file'))
     uploadProfilePicture(
         @UploadedFile(new ParseFilePipe({fileIsRequired: true})) file: Express.Multer.File,
         @ConnectedUser() connectedUser: ConnectedUserDto

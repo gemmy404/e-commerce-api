@@ -5,6 +5,7 @@ import {MongooseModule} from '@nestjs/mongoose';
 import {User, UsersSchema} from './schemas/users.schema';
 import {UsersMapper} from "./users.mapper";
 import {ResetPasswordCode, ResetPasswordCodeSchema} from "../auth/schemas/reset-password-code.schema";
+import {CloudinaryModule} from "../cloudinary/cloudinary.module";
 
 @Module({
     imports: [
@@ -12,6 +13,7 @@ import {ResetPasswordCode, ResetPasswordCodeSchema} from "../auth/schemas/reset-
             {name: User.name, schema: UsersSchema},
             {name: ResetPasswordCode.name, schema: ResetPasswordCodeSchema},
         ]),
+        CloudinaryModule
     ],
     controllers: [UsersController],
     providers: [UsersService, UsersMapper],
