@@ -1,6 +1,6 @@
 # E-Commerce API
 
-A full-featured e-commerce REST API built with NestJS. This API provides comprehensive functionality for managing an online store, including product management, shopping cart operations, order processing, and secure payment integration with Stripe.
+A full-featured e-commerce REST API built with NestJS. This API provides comprehensive functionality for managing an online store, including product management, shopping cart operations, order processing, secure payment integration with Stripe, and real-time stock quantity updates powered by Server-Sent Events (SSE) — keeping clients instantly informed of inventory changes without polling.
 
 ## Features
 
@@ -11,6 +11,7 @@ A full-featured e-commerce REST API built with NestJS. This API provides compreh
 - **Categories**: Organize products into categories for better navigation
 - **Coupons**: Discount code system for promotional campaigns
 - **Orders**: Complete order management from creation to fulfillment
+- **Real-time Stock Updates**: Live inventory quantity updates using Server-Sent Events (SSE) for instant stock availability changes
 - **Payment Processing**: Secure payment integration with Stripe (test mode)
 - **Image Hosting**: Cloudinary integration for product image storage
 
@@ -22,6 +23,7 @@ A full-featured e-commerce REST API built with NestJS. This API provides compreh
 - **Image Storage**: Cloudinary
 - **Payment Gateway**: Stripe (Test Mode)
 - **Authentication**: JWT (JSON Web Tokens)
+- **Real-time Communication**: Server-Sent Events (SSE)
 
 ## Stripe Test Mode
 
@@ -76,12 +78,13 @@ ecommerce-api/
 │   │   ├── mail/               # Email service
 │   │   ├── orders/             # Order management
 │   │   ├── products/           # Product CRUD
+│   │   ├── real-time/          # Real-time Communication service
 │   │   ├── stripe/             # Payment processing
 │   │   ├── sub-categories/     # Sub-category management
 │   │   └── users/              # User management
 │   ├── app.module.ts           # Root application module
 │   └── main.ts                 # Application entry point
-├── templates/                  # Email and Success/Fail payment templates
+├── templates/                  # Email, Success/Fail payment templates and test-stock-quantity-real-time
 ├── .env                        # Environment variables
 └── docker-compose.yml          # Docker setup
 ```
