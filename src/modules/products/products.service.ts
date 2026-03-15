@@ -13,6 +13,7 @@ import {SubCategory} from "../sub-categories/schemas/sub-category.schema";
 import {CartItem} from "../carts/schemas/cart-items.schema";
 import {CloudinaryService} from "../cloudinary/cloudinary.service";
 import {buildImageUrl} from "../../common/utils/buildImageUrl";
+import {RealTimeService} from "../real-time/real-time.service";
 
 @Injectable()
 export class ProductsService {
@@ -23,6 +24,7 @@ export class ProductsService {
         @InjectModel(StoreSetting.name) private readonly storeSettingModel: Model<StoreSetting>,
         private readonly productsMapper: ProductsMapper,
         private readonly cloudinaryService: CloudinaryService,
+        private readonly realTimeService: RealTimeService,
     ) {
     }
 
@@ -37,7 +39,7 @@ export class ProductsService {
 
         let uploadedDetails;
         try {
-         uploadedDetails = await this.cloudinaryService.uploadFile(imageCover);
+            uploadedDetails = await this.cloudinaryService.uploadFile(imageCover);
         } catch (e) {
             throw new BadRequestException(`Uploading image fail: ${e.message}`);
         }
@@ -218,13 +220,32 @@ export class ProductsService {
     }
 
     async decreaseStock(items: CartItem[]) {
-        const bulkOps = items.map((item: any) => ({
-            updateOne: {
-                filter: {_id: item.productId._id},
-                update: {$inc: {quantity: -item.quantity}}
+        const productIds: string[] = [];
+
+        const bulkOps = items.map((item: any) => {
+            productIds.push(item.productId._id);
+            return {
+                updateOne: {
+                    filter: {_id: item.productId._id},
+                    update: {$inc: {quantity: -item.quantity}}
+                }
             }
-        }));
-        return await this.productModel.bulkWrite(bulkOps);
+        });
+
+        const result = await this.productModel.bulkWrite(bulkOps);
+
+        const products = await this.productModel.find({
+            _id: {$in: productIds},
+        });
+
+        products.forEach(product => {
+            this.realTimeService.emit('STOCK_UPDATED', {
+                productId: product._id.toString(),
+                quantity: product.quantity,
+            });
+        });
+
+        return result;
     }
 
 }

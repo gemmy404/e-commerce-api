@@ -7,6 +7,7 @@ import {ProductsMapper} from "./products.mapper";
 import {StoreSetting, StoreSettingSchema} from "../admin/schemas/store-settings.schema";
 import {SubCategory, SubCategorySchema} from "../sub-categories/schemas/sub-category.schema";
 import {CloudinaryModule} from "../cloudinary/cloudinary.module";
+import {RealTimeModule} from "../real-time/real-time.module";
 
 @Module({
     imports: [
@@ -16,6 +17,7 @@ import {CloudinaryModule} from "../cloudinary/cloudinary.module";
             {name: StoreSetting.name, schema: StoreSettingSchema},
         ]),
         CloudinaryModule,
+        RealTimeModule,
     ],
     controllers: [ProductsController],
     providers: [ProductsService, ProductsMapper],
