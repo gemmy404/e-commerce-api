@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+    <meta charset="UTF-8">
+    <title>Stock Real-time Monitor</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            background: #f4f4f9;
+            padding: 20px;
+        }
+
+        .product-card {
+            background: white;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 10px;
+            display: inline-block;
+            width: 200px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            transition: all 0.5s ease;
+            vertical-align: top;
+        }
+
+        .stock-count {
+            font-size: 24px;
+            font-weight: bold;
+            color: #2c3e50;
+        }
+
+        .updated {
+            background-color: #e8f5e9;
+            transform: scale(1.05);
+            border: 2px solid #4caf50;
+        }
+
+        .status {
+            font-weight: bold;
+        }
+
+        .online {
+            color: green;
+        }
+
+        .offline {
+            color: red;
+        }
+    </style>
+</head>
+<body>
+
+<h1>Real-time Inventory Monitor</h1>
+<p id="connection-status">Connection Status: <span class="status">Connecting...</span></p>
+
+<div id="products-container">
+</div>
+
+<script>
+    const container = document.getElementById('products-container');
+    const statusLabel = document.querySelector('.status');
+
+    // Initial data fetch
+    async function loadProducts() {
+        try {
+            const response = await fetch('http://localhost:3000/api/v1/products?size=100');
+            const products = await response.json();
+
+            if (products.data) {
+                products.data.forEach(p => renderProduct(p));
+            }
+        } catch (err) {
+            console.error("Error fetching products:", err);
+        }
+    }
+
+    function renderProduct(p) {
+        const div = document.createElement('div');
+        div.className = 'product-card';
+        div.id = `prod-${p.id}`;
+        div.innerHTML = `
+                <h3>${p.name || 'Product'}</h3>
+                <div class="stock-count" id="qty-${p.id}">${p.quantity}</div>
+                <small>ID: ${p.id}</small>
+            `;
+        container.appendChild(div);
+    }
+
+    // Connecting to the SSE Stream
+    const eventSource = new EventSource('http://localhost:3000/api/v1/realtime/stream');
+
+    eventSource.onopen = () => {
+        statusLabel.innerText = 'Connected';
+        statusLabel.className = 'status online';
+    };
+
+    eventSource.onmessage = (event) => {
+        const payload = JSON.parse(event.data);
+        console.log("New update received:", payload);
+
+        if (payload.event === 'STOCK_UPDATED') {
+            const {productId, quantity} = payload.data;
+            updateUI(productId, quantity);
+        }
+    };
+
+    function updateUI(id, newQty) {
+        const qtyElement = document.getElementById(`qty-${id}`);
+        const cardElement = document.getElementById(`prod-${id}`);
+
+        if (qtyElement) {
+            qtyElement.innerText = newQty;
+
+            // Visual feedback for the update
+            cardElement.classList.add('updated');
+            setTimeout(() => cardElement.classList.remove('updated'), 1000);
+        }
+    }
+
+    eventSource.onerror = () => {
+        statusLabel.innerText = 'Disconnected';
+        statusLabel.className = 'status offline';
+    };
+
+    loadProducts();
+</script>
+</body>
+</html>
