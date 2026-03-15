@@ -16,6 +16,7 @@ import {OrdersModule} from "./modules/orders/orders.module";
 import {CloudinaryModule} from './modules/cloudinary/cloudinary.module';
 import {ScheduleModule} from "@nestjs/schedule";
 import {ValidationException} from "./common/exceptions/validation.exception";
+import { RealTimeModule } from './modules/real-time/real-time.module';
 
 @Module({
     imports: [
@@ -36,6 +37,7 @@ import {ValidationException} from "./common/exceptions/validation.exception";
         OrdersModule,
         StripeModule,
         CloudinaryModule,
+        RealTimeModule,
     ],
     controllers: [],
     providers: [
