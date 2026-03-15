@@ -11,6 +11,7 @@ async function bootstrap() {
     });
 
     app.useGlobalFilters(new AllExceptionsFilter());
+    app.enableCors();
 
     app.use('/uploads', express.static(join(__dirname, '..', 'uploads')));
     app.use(express.static("templates"));
